@@ -25,4 +25,4 @@ python main.py joshua-dunlop-alakazam.jpg
 
 The following PNG image is the result of a test with the image joshua-dunlop-alakazam.jpg.
 
-![alt text](https://github.com/shaunmillerc1010/crypto/blob/master/bb.png)
+![alt text](https://github.com/shaunmillerc1010/WhosThatPokemon/blob/main/preview.png)
