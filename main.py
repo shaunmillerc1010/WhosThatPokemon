@@ -1,6 +1,6 @@
-""" Who's that Pokemon? 
+""" Who's that Pokemon?
 	Here we write a machine learning program to classify pictures of Pokemon.
-	We use machine learning python libraries including TensorFlow and Keras. 
+	We use machine learning python libraries including TensorFlow and Keras.
 	Results will typically be displayed in Plotly and Matplotlib.
 
 	Written by Shaun Miller using the Kaggle dataset https://www.kaggle.com/thedagger/pokemon-generation-one.
@@ -10,8 +10,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import PIL
+from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw
 import pathlib
+import sys
 
 import tensorflow as tf
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' #silence some of the tf warnings
@@ -23,7 +26,7 @@ from tensorflow.keras.models import Sequential
 
 #Download and explore the dataset
 
-def get_local_data(file_path, val_split=0.1, batch_size = 32, height = 180, width = 180):
+def get_local_data(file_path, val_split=0.2, batch_size = 32, height = 180, width = 180):
 	#returns training and validation datasets from a local dataset
 
 	data_dir = pathlib.Path(file_path)
@@ -43,7 +46,7 @@ def get_local_data(file_path, val_split=0.1, batch_size = 32, height = 180, widt
 		seed=710,
 		image_size=(height, width),
 		batch_size=batch_size)
-	
+
 	class_names = train_ds.class_names
 	print('Pokemon in set:', class_names[:3], ' ... ', class_names[-3:])
 
@@ -55,11 +58,11 @@ def configure_ds(train_ds, val_ds):
 	val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 	return train_ds, val_ds
 
-def create_model(num_classes = 7, height = 180, width = 180):
-	
+def create_model(num_classes = 149, height = 180, width = 180):
+
 	#add data augmentation for more accurate results
 	data_augmentation = keras.Sequential(
-		[layers.experimental.preprocessing.RandomFlip("horizontal", 
+		[layers.experimental.preprocessing.RandomFlip("horizontal",
 		    input_shape=(height,width,3)),
 			layers.experimental.preprocessing.RandomRotation(0.1),
 			layers.experimental.preprocessing.RandomZoom(0.1)]
@@ -70,7 +73,7 @@ def create_model(num_classes = 7, height = 180, width = 180):
 		data_augmentation,
 		#normalize model with rescaling
 		layers.experimental.preprocessing.Rescaling(1./255, input_shape=(height, width, 3)),
-		
+
 		layers.Conv2D(16, 3, padding='same', activation='relu'),
 		layers.MaxPooling2D(),
 		layers.Conv2D(32, 3, padding='same', activation='relu'),
@@ -90,7 +93,7 @@ def create_model(num_classes = 7, height = 180, width = 180):
 
 	return model
 
-def train_model(model, train_ds, val_ds, epochs=20):
+def train_model(model, train_ds, val_ds, epochs=12):
 	history = model.fit(
 		train_ds,
 		validation_data=val_ds,
@@ -98,7 +101,7 @@ def train_model(model, train_ds, val_ds, epochs=20):
 		)
 	return history, epochs
 
-def make_prediction(model, picture_path = "seanpt3009_vulpix.jpg", height = 180, width = 180):
+def make_prediction(model, picture_path, height = 180, width = 180):
 
 	img = keras.preprocessing.image.load_img(
     	picture_path, target_size=(height, width)
@@ -109,61 +112,28 @@ def make_prediction(model, picture_path = "seanpt3009_vulpix.jpg", height = 180,
 	predictions = model.predict(img_array)
 	score = tf.nn.softmax(predictions[0])
 
-	print(
-	    "{} : This image most likely belongs to {} with a {:.2f} percent confidence."
-	    .format(picture_path, class_names[np.argmax(score)], 100 * np.max(score))
-	)
+	result_string = "Likely {} with {:.2f}% confidence.".format(class_names[np.argmax(score)], 100 * np.max(score))
+	#written by Shaun Miller
+	img_to_print = Image.open(picture_path)
+	draw = ImageDraw.Draw(img_to_print)
+	# font = ImageFont.truetype(<font-file>, <font-size>)
+	font = ImageFont.truetype("arial.ttf", 100)
+	draw.text((0, 0),result_string,(255,255,255),font=font)
+	img_to_print.show()
 
 
 if __name__ == "__main__":
-	train_ds, val_ds = get_local_data('practice')
+
+	#Retreive dataset
+	train_ds, val_ds = get_local_data('dataset')
 	class_names = train_ds.class_names
 
-#visualize the dataset
-	# plt.figure(figsize=(10, 10))
-	# for images, labels in train_ds.take(1):
-	# 	for i in range(9):
-	# 		ax = plt.subplot(3, 3, i + 1)
-	# 		plt.imshow(images[i].numpy().astype("uint8"))
-	# 		plt.title(class_names[labels[i]])
-	# 		plt.axis("off")
-
-	# plt.show()
-
+	#Train the Model
 	train_ds, val_ds = configure_ds(train_ds, val_ds)
 	model = create_model()
 	print(model.summary())
 	history, epochs = train_model(model, train_ds, val_ds)
 
-	# ###View model results
-
-	
-	# acc = history.history['accuracy']
-	# val_acc = history.history['val_accuracy']
-
-	# loss = history.history['loss']
-	# val_loss = history.history['val_loss']
-
-	# epochs_range = range(epochs)
-
-	# plt.figure(figsize=(8, 8))
-	# plt.subplot(1, 2, 1)
-	# plt.plot(epochs_range, acc, label='Training Accuracy')
-	# plt.plot(epochs_range, val_acc, label='Validation Accuracy')
-	# plt.legend(loc='lower right')
-	# plt.title('Training and Validation Accuracy')
-
-	# plt.subplot(1, 2, 2)
-	# plt.plot(epochs_range, loss, label='Training Loss')
-	# plt.plot(epochs_range, val_loss, label='Validation Loss')
-	# plt.legend(loc='upper right')
-	# plt.title('Training and Validation Loss')
-	# plt.show()
-
-
-	print(make_prediction(model))
-	print(make_prediction(model, picture_path = 'MBrumArt_Zapdos.jpg'))
-	print(make_prediction(model, picture_path = 'Kooale325_growlithe.jpg'))
-
-
-
+	#Test the Model
+	picture_path = sys.argv[1]
+	make_prediction(model, picture_path = picture_path)
