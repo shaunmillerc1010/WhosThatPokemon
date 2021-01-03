@@ -58,7 +58,7 @@ def configure_ds(train_ds, val_ds):
 	val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 	return train_ds, val_ds
 
-def create_model(num_classes = 149, height = 180, width = 180):
+def create_model(num_classes = 5, height = 180, width = 180):
 
 	#add data augmentation for more accurate results
 	data_augmentation = keras.Sequential(
@@ -78,11 +78,11 @@ def create_model(num_classes = 149, height = 180, width = 180):
 		layers.MaxPooling2D(),
 		layers.Conv2D(32, 3, padding='same', activation='relu'),
 		layers.MaxPooling2D(),
-		layers.Conv2D(64, 3, padding='same', activation='relu'),
-		layers.MaxPooling2D(),
+		#layers.Conv2D(64, 3, padding='same', activation='relu'), #uncomment for entire data set
+		#layers.MaxPooling2D(), #uncomment for entire data set
 		layers.Dropout(0.15),
 		layers.Flatten(),
-		layers.Dense(128, activation='relu'),
+		#layers.Dense(128, activation='relu'), #uncomment for entire data set
 		layers.Dense(num_classes)
 	])
 
@@ -93,7 +93,7 @@ def create_model(num_classes = 149, height = 180, width = 180):
 
 	return model
 
-def train_model(model, train_ds, val_ds, epochs=12):
+def train_model(model, train_ds, val_ds, epochs= 12):
 	history = model.fit(
 		train_ds,
 		validation_data=val_ds,
@@ -116,7 +116,6 @@ def make_prediction(model, picture_path, height = 180, width = 180):
 	#written by Shaun Miller
 	img_to_print = Image.open(picture_path)
 	draw = ImageDraw.Draw(img_to_print)
-	# font = ImageFont.truetype(<font-file>, <font-size>)
 	font = ImageFont.truetype("arial.ttf", 100)
 	draw.text((0, 0),result_string,(255,255,255),font=font)
 	img_to_print.show()
@@ -125,7 +124,7 @@ def make_prediction(model, picture_path, height = 180, width = 180):
 if __name__ == "__main__":
 
 	#Retreive dataset
-	train_ds, val_ds = get_local_data('dataset')
+	train_ds, val_ds = get_local_data('dataset_popular')
 	class_names = train_ds.class_names
 
 	#Train the Model
@@ -135,5 +134,4 @@ if __name__ == "__main__":
 	history, epochs = train_model(model, train_ds, val_ds)
 
 	#Test the Model
-	picture_path = sys.argv[1]
-	make_prediction(model, picture_path = picture_path)
+	for picture_path in sys.argv[1:]: make_prediction(model, picture_path = picture_path)
