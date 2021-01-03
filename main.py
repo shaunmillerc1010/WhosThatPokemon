@@ -82,7 +82,7 @@ def create_model(num_classes = 5, height = 180, width = 180):
 		#layers.MaxPooling2D(), #uncomment for entire data set
 		layers.Dropout(0.15),
 		layers.Flatten(),
-		#layers.Dense(128, activation='relu'), #uncomment for entire data set
+		layers.Dense(128, activation='relu'), #uncomment for entire data set
 		layers.Dense(num_classes)
 	])
 

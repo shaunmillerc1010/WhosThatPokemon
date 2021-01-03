@@ -6,8 +6,8 @@ This program follows some of the tutorial from the TensorFlow website: https://w
 
 The program first creates a machine learning model and trains the model with the specified data set containing hundreds of generation 1 Pokemon images. We limit the data set to 5 popular Pokemon (Mewtwo, Pikachu, Charmander, Squirtle, and Bulbasaur) for resource-preserving and instructional purposes. Instructions for including the entire 149 pokemon in the model lies at the bottom of this README.
 
-After learning from the data set, we test the model with a realistic Pokemon image designed by Joshua Dunlop. I figured these would be great images for testing since the data set the model uses to train contains few (if any) realistic Pokemon images.
-A full gallery of realistic images can be found on https://www.artstation.com/joshuadunlop/albums/1256278.
+After learning from the data set, we test the model with a realistic Pokemon image designed by Joshua Dunlop. I figured these would be great images for testing since the data set the model uses to train contains few (if any) realistic Pokemon images. 
+A full gallery of realistic images can be found on https://www.artstation.com/joshuadunlop/albums/1256278. I also included some fan art from u/neildluffy to show the algorithm's behavior on more cartoon-like images.
 Given a specified testing image, the machine learning model makes a prediction of the Pokemon's name while displaying the model's confidence level.
 
 To run the program, first download the dependencies.
