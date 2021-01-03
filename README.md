@@ -7,6 +7,7 @@ This program follows some of the tutorial from the TensorFlow website: https://w
 The program first creates a machine learning model and trains the model with the specified data set containing hundreds of generation 1 Pokemon images.
 After learning from the data set, we test the model with a realistic Pokemon image designed by Joshua Dunlop.
 A full gallery of realistic images can be found on https://www.artstation.com/joshuadunlop/albums/1256278.
+The machine learning model then makes a prediction of the Pokemon's name while displaying the model's confidence level.
 
 To run the program, first download the dependencies.
 ```
